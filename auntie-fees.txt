@@ -1,0 +1,32 @@
+BTCC
+  - triangle: 0.2%
+  - withdrawal
+    + BTC: 0.001
+    + USD: 0.3%
+Kraken
+  - triangle: 0.26%
+  - withdrawal
+    + BTC: 0.001
+    + ETH: 0.005
+    + USD: 5
+GDAX
+  - triangle
+    + BTC/USD: 0.25%
+    + ETH/BTC: 0.3%
+    + ETH/USD: 0.3%
+  - withdrawal: none?
+Gemini
+  - triangle: 0.25%
+  - withdrawal: free
+Bitfinex
+  - triangle: 0.200%
+  - withdrawal
+    + BTC: 0.0004
+    + ETH: 0.01
+    + USD: 0.1%
+Bitstamp
+  - triangle: 0.25%
+  - withdrawal
+    + BTC: free
+    + ETH: free
+    + USD: 3.45
