@@ -10,9 +10,9 @@ from search_problem import ArbitrageSearchProblem
 # call BFS for actions
 # simulate actions on real history
 
-look_back = 10 # ideally, v high
-look_ahead = 6
-capital = 5000
+look_back = 115 # ideally, v high
+look_ahead = 3
+capital = 100
 
 con = sqlite3.connect('prices.db')
 cur = con.cursor()

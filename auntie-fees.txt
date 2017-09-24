@@ -10,6 +10,7 @@ Kraken
     + ETH: 0.005
     + USD: 5
 GDAX
+  # TODO
   - triangle
     + BTC/USD: 0.25%
     + ETH/BTC: 0.3%
