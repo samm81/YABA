@@ -29,7 +29,10 @@ import crayons
 from process_db import generate_exchange_tree
 from prediction import generate_predictions_tree
 from search_problem import ArbitrageSearchProblem
-from bfs import arbitrageBFS
+from bfs import brutebfs
+
+tickers = [ 'btc', 'eth' ]
+trusted_exchanges = [ 'Kraken', 'GDAX', 'Gemini', 'Bitfinex', 'Bitstamp' ] # BTCC
 
 if __name__ == '__main__':
   """Main CLI entrypoint"""
@@ -39,7 +42,7 @@ if __name__ == '__main__':
   verbose = arguments['--verbose']
   figures = arguments['--figures']
 
-  print('\n{} {} {}\n'.format(crayons.blue('Welcome to yaba (Yet Another Bitcoin Arbitrage).'), crayons.green('CA$H and CO1NZ', bold=True), crayons.blue('will be flowing shortly.')))
+  print('\n{} {} {}\n'.format(crayons.blue('Welcome to yaba (Yet Another Bitcoin Arbitrage).'), crayons.green('CA$H and CO1NZ', bold=True), crayons.blue('are in your future...')))
 
   print(crayons.yellow('loading prices database {}...'.format(pricef)))
   conn = None
@@ -52,18 +55,18 @@ if __name__ == '__main__':
     sys.exit(1)
 
   print(crayons.yellow('generating exchange tree...'))
-  exchange_tree = generate_exchange_tree(conn.cursor())
+  exchange_tree = generate_exchange_tree(conn.cursor(), trusted_exchanges)
 
   print(crayons.yellow('predicting future values (this may take a while)...'))
-  predictions_tree = generate_predictions_tree(exchange_tree, suppress_output=(not verbose), render=figures)
+  predictions_tree = generate_predictions_tree(exchange_tree, suppress_prophet_output=(not verbose), render=figures, distance=6)
 
   print(crayons.yellow('starting arbitrage search...'))
-  arbitrage_search_problem = ArbitrageSearchProblem(predictions_tree)
-  actions, result = arbitrageBFS(arbitrage_search_problem)
+  arbitrage_search_problem = ArbitrageSearchProblem(predictions_tree, depth_limit=6)
+  actions, result = brutebfs(arbitrage_search_problem)
   print(crayons.yellow('done!'))
 
-  _, _, time_, _, _ = actions[-1]
-  print('\n{} {} {} {} {}\n'.format(crayons.blue('found a way to make'), crayons.red('${:.2f}'.format(result), bold=True), crayons.blue('in'), crayons.blue(time_), crayons.blue('hours')))
+  max_timestep = actions[-1].timestep
+  print('\n{} {} {} {} {}\n'.format(crayons.blue('found a way to make'), crayons.red('${:.2f}'.format(result), bold=True), crayons.blue('in'), crayons.blue(max_timestep, bold=True), crayons.blue('hours')))
 
   def format_amount(amount, currency):
     if currency == 'USD':
@@ -71,20 +74,21 @@ if __name__ == '__main__':
     else:
       amount = '{:.4f}'.format(amount)
     return amount
-  for step, ((exchange1, currency1, time1, amount1, _), (exchange2, currency2, time2, amount2, _)) in enumerate(zip(actions, actions[1:])):
+
+  for step, ((exchange1, currency1, amount1, time1, _), (exchange2, currency2, amount2, time2, _)) in enumerate(zip(actions, actions[1:])):
     amount1, amount2 = [ format_amount(amount, currency) for amount, currency in zip([amount1, amount2], [currency1, currency2]) ]
-    str = 'step {}: '.format(step)
+    step_str = 'step {}: '.format(step)
     if time1 == time2:
       if exchange1 == exchange2:
-        str += 'take your {} {} on {} and buy {} {}'.format(amount1, currency1, exchange1, amount2, currency2)
+        step_str += 'take your {} {} on {} and buy {} {}'.format(amount1, currency1, exchange1, amount2, currency2)
       else:
-        str += 'take your {} {} on {} and move it to {}'.format(amount1, currency1, exchange1, exchange2)
+        step_str += 'take your {} {} on {} and move it to {}'.format(amount1, currency1, exchange1, exchange2)
     else:
       if exchange1 == exchange2:
-        str += 'hold on to your {} {} on {} for an hour'.format(amount1, currency1, exchange1)
+        step_str += 'hold on to your {} {} on {} for an hour'.format(amount1, currency1, exchange1)
       else:
-        str += 'take your {} {} on {} and move it to {} (allow one hour for processing)'.format(amount1, currency1, exchange1, exchange2)
-    print(crayons.magenta(str))
+        step_str += 'take your {} {} on {} and move it to {} (allow one hour for processing)'.format(amount1, currency1, exchange1, exchange2)
+    print(crayons.magenta(step_str))
 
   print(crayons.blue('\nAll data provided here is provided purely for informational purposes only. We are not responsible for any losses you incur from these suggestions. (We will take the credit for gains ;) )\n'))
 

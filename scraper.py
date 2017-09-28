@@ -7,12 +7,14 @@ from datetime import datetime
 
 import crayons
 
-trusted_exchanges = [ 'BTCC', 'Kraken', 'GDAX', 'Gemini', 'Bitfinex', 'Bitstamp' ]
+from yaba import trusted_exchanges
+from yaba import tickers
+
 exchange_to_series = defaultdict(dict)
-tickers = [ 'btc', 'eth' ]
 exchange_tickers = tickers + [ 'usd' ]
 ticker_to_coin = { 'btc': 'bitcoin', 'eth': 'ethereum' }
 coins = [ ticker_to_coin[ticker] for ticker in tickers ]
+
 session = requests.Session()
 
 if __name__ == '__main__':

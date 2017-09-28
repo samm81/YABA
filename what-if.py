@@ -1,6 +1,6 @@
 import sqlite3
 
-from bfs import arbitrageBFS
+from bfs import brutebfs
 from process_db import generate_exchange_tree
 from prediction import generate_predictions_tree
 from search_problem import ArbitrageSearchProblem
@@ -19,7 +19,7 @@ cur = con.cursor()
 prefix_tree = generate_exchange_tree(cur, look_back, True)
 prediction_tree = generate_predictions_tree(prefix_tree, look_ahead)
 prob = ArbitrageSearchProblem(prediction_tree, start_amount=capital)
-bestActions, bestValue = arbitrageBFS(prob)
+bestActions, bestValue = brutebfs(prob)
 print(bestActions)
 
 time = 0

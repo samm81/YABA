@@ -1,10 +1,9 @@
 import sqlite3
 
-from scraper import trusted_exchanges
-from bfs import arbitrageBFS
+from bfs import brutebfs
 from search_problem import ArbitrageSearchProblem
 
-def generate_exchange_tree(cursor, depth=10000, earliest=False): # default take all data
+def generate_exchange_tree(cursor, trusted_exchanges, depth=10000, earliest=False): # default take all data
   exchanges = [ exchange.lower() for exchange in trusted_exchanges]
   def get_data(exchange):
     if earliest:
@@ -39,6 +38,6 @@ if __name__ == '__main__':
   exchange_tree = get_exchange_tree(depth)
   #print(exchange_tree)
   problem = ArbitrageSearchProblem(exchange_tree, depth)
-  best_actions, best_value = arbitrageBFS(problem)
+  best_actions, best_value = brutebfs(problem)
   print(best_value)
   print(list(best_actions))
